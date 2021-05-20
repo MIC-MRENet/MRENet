@@ -1,0 +1,3 @@
+nohup: ignoring input
+usage: train.py [-h] [-e E] [-b [B]] [-l [LR]] [-f LOAD] [-s SCALE] [-v VAL]
+train.py: error: unrecognized arguments: --Label -2
