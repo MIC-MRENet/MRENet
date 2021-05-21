@@ -18,13 +18,8 @@ class BasicDataset(Dataset):
         self.scale = scale
         assert 0 < scale <= 1, 'Scale must be between 0 and 1'
 
-        #self.ids = [splitext(file)[0] for file in listdir(imgs_dir)
-                    #if not file.startswith('.')]
-
-        #
-        # a =[39,40]+ list(np.linspace(42, 56, num=15))+[58,60,61,62]+list(np.linspace(65, 78, num=14))+[80]
+   
         a=list(np.linspace(0, 0, num=1))
-        # a = list(np.linspace(0, 14, num=15)) + list(np.linspace(60, 71, num=12))
         self.ids = [str(int(i)) for i in a]
 
         logging.info(f'Creating dataset with {len(self.ids)} examples')
@@ -37,10 +32,6 @@ class BasicDataset(Dataset):
         w, h, d = 481,481,481
         newW, newH, newD = int(scale * w), int(scale * h), int(scale * d)
         assert newW > 0 and newH > 0, 'Scale is too small'
-        # if pil_img.max()==2:
-        #     pil_img=(pil_img*127.5).astype(np.uint8)
-        #     pil_img = transform.resize(pil_img, (newW, newH, newD), anti_aliasing=False)
-        #     #ret1, pil_img = cv2.threshold(pil_img, 0.7, 1, cv2.THRESH_BINARY)
         if pil_img1.max()==1:
             pil_img=(pil_img1*255).astype(np.uint8)
             pil_img = transform.resize(pil_img, (newW, newH, newD), anti_aliasing=False)
@@ -82,11 +73,11 @@ class BasicDataset(Dataset):
         img_file4 = glob(self.imgs_dir +'UNet-4/' +'TMJ_' +idx + '.nii.gz')
         img_file5 = glob('/data/zk/1/data/imgs/TMJ_imgs/'+'TMJ_' +idx + '.nii.gz')
 
-        # assert len(mask_file) == 1, \
-        #     f'Either no mask or multiple masks found for the ID {idx}: {mask_file}'
-        # assert len(img_file) == 1, \
-        #     f'Either no image or multiple images found for the ID {idx}: {img_file}'
-        # mask = Image.open(mask_file[0])
+        assert len(mask_file) == 1, \
+            f'Either no mask or multiple masks found for the ID {idx}: {mask_file}'
+        assert len(img_file) == 1, \
+            f'Either no image or multiple images found for the ID {idx}: {img_file}'
+        mask = Image.open(mask_file[0])
         mask = sitk.ReadImage(mask_file[0])
         mask = sitk.GetArrayFromImage(mask)
         img1 = sitk.ReadImage(img_file1[0])
@@ -101,16 +92,10 @@ class BasicDataset(Dataset):
         img5 = sitk.GetArrayFromImage(img5)
         # img = Image.open(img_file[0]).convert('L')
 
-        # assert img.size == mask.size, \
-        #     f'Image and mask {idx} should be the same size, but are {img.size} and {mask.size}'
+        assert img.size == mask.size, \
+            f'Image and mask {idx} should be the same size, but are {img.size} and {mask.size}'
 
         img = self.preprocess(img1, img2, img3, img4, img5, self.scale)
         mask = self.preprocess(mask, 0, 0, 0,0, self.scale)
-
-        # img_temp = np.zeros((1, 64, 128, 128))
-        # mask_temp = np.zeros((1, 64, 128, 128))
-        # for i in range(0, 64):
-        #     img_temp[:, i, :, :] = img[:, i*2, :, :]
-        #     mask_temp[:, i, :, :] = mask[:, i*2, :, :]
 
         return {'image': torch.from_numpy(img), 'mask': torch.from_numpy(mask)}
