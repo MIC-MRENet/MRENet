@@ -97,9 +97,6 @@ def get_output_filenames(args):
             pathsplit = os.path.splitext(f)
             # out_files.append("{}_OUT{}".format(pathresult = sitk.GetImageFromArray(output.astype(np.uint8)).split[0], pathsplit[1]))
             out_files.append("{}_OUT{}".format(pathsplit[0], pathsplit[1]))
-    # elif len(in_files) != len(args.output):
-    #     logging.error("Input files and output files are not of the same length")
-    #     raise SystemExit()
     else:
         out_files = args.output
 
@@ -123,10 +120,6 @@ if __name__ == "__main__":
     args = get_args()
     in_files = args.input
     out_files = get_output_filenames(args)
-    #gt_files = args.gt
-
-    #gt = sitk.ReadImage(gt_files[0])
-    #gt = sitk.GetArrayFromImage(gt)
 
     net = UNet(n_channels=5, n_classes=1)
 
@@ -168,28 +161,15 @@ if __name__ == "__main__":
 
         if not args.no_save:
             out_fn = out_files[i]
-            #result = sitk.GetImageFromArray(mask_to_image(mask))    
-            #max_mask = mask.max()
-            # a = (mask*255).astype(np.uint8)
             b = transform.resize(mask, (481,481,481), anti_aliasing=False, preserve_range=True)
             ret1, output = cv2.threshold(b, 0, 1, cv2.THRESH_BINARY)
-
             result = sitk.GetImageFromArray(output.astype(np.uint8))
-            # result = sitk.GetImageFromArray(b)
-            # result = sitk.GetImageFromArray(b)
-            #result.save(out_files[i]   
             sitk.WriteImage(result, out_files + fn)
-            #a = torch.from_numpy(a/255)
-            #gt = torch.from_numpy((gt*255).astype(np.uint8))
-            #gt = transform.resize((gt*255).astype(np.uint8), (134, 134, 134), anti_aliasing=False)
-            #gt = torch.from_numpy(gt)
-            #print(dice_coeff(a.double(), gt).item())
+
 	    
 
             logging.info("Mask saved to {}".format(out_files[i]))
     t1=time.time()
     print(t1-t0)
 
-        # if args.viz:
-        #     logging.info("Visualizing results for image {}, close to continue ...".format(fn))
-        #     plot_img_and_mask(img, mask)
+
