@@ -35,13 +35,6 @@ def predict_img(net,
     with torch.no_grad():
         output = net(img)
         max_out = output.cpu().numpy().max()
-
-        # if net.n_classes > 1:
-        #     probs = F.softmax(output, dim=1)
-        # else:
-        #     probs = torch.sigmoid(output)
-        #     max0 = probs.cpu().numpy().max()
-
         probs = output.squeeze()
 
         tf = transforms.Compose(
@@ -146,28 +139,9 @@ if __name__ == "__main__":
                            device=device)
 
         if not args.no_save:
-            # out_fn = out_files[i]
-            #result = sitk.GetImageFromArray(mask_to_image(mask))    
-            #max_mask = mask.max()
-            # a = (mask*255).astype(np.uint8)
             b = transform.resize(mask, (160,160,160), anti_aliasing=False, preserve_range=True)
-            # ret1, output = cv2.threshold(b, 0, 1, cv2.THRESH_BINARY)
-            # a = b.astype(np.int16)
-            # c = np.round(b)
-            # c= np.round(b).astype(np.int16)
-            # result = sitk.GetImageFromArray(output.astype(np.uint8))
             result = sitk.GetImageFromArray(b)
-            #result.save(out_files[i]   
-
             sitk.WriteImage(result, out_files + fn +'.gz')
-            #a = torch.from_numpy(a/255)
-            #gt = torch.from_numpy((gt*255).astype(np.uint8))
-            #gt = transform.resize((gt*255).astype(np.uint8), (134, 134, 134), anti_aliasing=False)
-            #gt = torch.from_numpy(gt)
-            #print(dice_coeff(a.double(), gt).item())
-	    
-
-            # logging.info("Mask saved to {}".format(out_files[i]))
 
         if args.viz:
             logging.info("Visualizing results for image {}, close to continue ...".format(fn))
