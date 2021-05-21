@@ -18,12 +18,6 @@ class BasicDataset(Dataset):
         self.masks_dir = masks_dir
         self.scale = scale
         assert 0 < scale <= 1, 'Scale must be between 0 and 1'
-
-        #self.ids = [splitext(file)[0] for file in listdir(imgs_dir)
-                    #if not file.startswith('.')]
-
-        # a = list(np.linspace(0,20, num=21))+[22]+list(np.linspace(24,35, num=12))+[37,38]
-        # a = list(np.linspace(15, 44, num=30))
         a = list(np.linspace(45, 71, num=27))
         self.ids = [str(int(i)) for i in a]
 
@@ -48,11 +42,7 @@ class BasicDataset(Dataset):
             #ret1, pil_img = cv2.threshold(pil_img, 0.7, 1, cv2.THRESH_BINARY)
 
         else:
-            # pil_img = np.array(pil_img)
-            # mn =pil_img.mean()
-            # std = pil_img.std()
-            # pil_imgZ = (pil_img-mn)/std
-            # pil_img2 = preprocessing.StandardScaler().fit(pil_img)
+            
             pil_img = transform.resize(pil_img, (int(newW), newH, newD), anti_aliasing=False)
 
        
@@ -65,10 +55,6 @@ class BasicDataset(Dataset):
 
         # HWC to CHW
         img_trans = img_nd.transpose((3, 0, 1, 2))
-        # if img_trans.max() > 500:
-        #     img_trans = img_trans / 32768
-        # if img_trans.max() > 2:
-        #     img_trans = img_trans / 255
 
         return img_trans
 
@@ -93,11 +79,5 @@ class BasicDataset(Dataset):
 
         img = self.preprocess(img, self.scale)
         mask = self.preprocess(mask, self.scale)
-
-        # img_temp = np.zeros((1, 64, 128, 128))
-        # mask_temp = np.zeros((1, 64, 128, 128))
-        # for i in range(0, 64):
-        #     img_temp[:, i, :, :] = img[:, i*2, :, :]
-        #     mask_temp[:, i, :, :] = mask[:, i*2, :, :]
 
         return {'image': torch.from_numpy(img), 'mask': torch.from_numpy(mask)}
